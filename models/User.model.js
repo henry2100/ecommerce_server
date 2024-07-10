@@ -3,6 +3,15 @@ const mongoose = require('mongoose');
 //Define Schema
 const Schema = mongoose.Schema;
 
+// Address Schema
+const AddressSchema = new Schema({
+    houseNum: { type: String, required: false },
+    street: { type: String, required: false },
+    busStop: { type: String, required: false },
+    city: { type: String, required: false },
+    state: { type: String, required: false }
+}, { _id: false });
+
 // User Schema
 const UserSchema = new Schema(
     {
@@ -20,11 +29,6 @@ const UserSchema = new Schema(
                 unique: false
             }
         },
-        username: {
-            type: String,
-            required: true,
-            unique: true
-        },
         email: {
             type: String,
             required: true,
@@ -32,6 +36,10 @@ const UserSchema = new Schema(
         },
         password: {
             type: String,
+            required: true
+        },
+        address: {
+            type: AddressSchema,
             required: true
         },
         country: {
