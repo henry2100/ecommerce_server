@@ -9,6 +9,7 @@ const {
     generateResetToken,
     veryResetToken
 } = require('../middlewares/authTokens');
+const { Session } = require('express-session');
 
 const handleForgotPassword = async (req, res) => {
     console.log("req:", req.body.email);
@@ -41,12 +42,9 @@ const addUser = asyncHandler(async (req, res) => {
 
     try {
         const doesUserExist_by_email = await User.findOne({ email: req.body.email });
-        const doesUserExist_by_username = await User.findOne({ email: req.body.username });
 
         if (doesUserExist_by_email) {
             return res.status(400).send({ message: `${req.body.email} has already been registered` });
-        } else if(doesUserExist_by_username){
-            return res.status(400).send({ message: `${req.body.username} has already been registered` });
         } else {
             const hashedPasswd = await bcrypt.hash(req.body.password, 10);
 
@@ -71,6 +69,49 @@ const getAuthUser = async (req, res) => {
     }
 }
 
+// const loginUser = async (req, res) => {
+//     const { email, password } = req.body;
+
+//     try {
+//         const user = await User.findOne({ email });
+
+//         if (user) {
+//             const userPasswd = await bcrypt.compare(password, user.password);
+
+//             if (userPasswd) {
+//                 // Create access and refresh tokens
+//                 const accessToken = await generateAccessToken(user);
+//                 const refreshToken = await generateRefreshToken(user);
+
+//                 // Create session
+//                 req.session.userId = user._id; // Save user ID in session
+//                 req.session.accessToken = accessToken; // Optionally store token in session
+
+//                 console.log('Session:', {
+//                     userId: req.session.userId,
+//                     accessToken: req.session.accessToken
+//                 });
+
+//                 res.status(200).send({
+//                     data: user,
+//                     token: {
+//                         accessToken: accessToken,
+//                         refreshToken: refreshToken
+//                     },
+//                     message: "Authentication Successful"
+//                 });
+//             } else {
+//                 res.status(401).send({ message: "Incorrect password" });
+//             }
+//         } else {
+//             res.status(404).send({ message: "User not found" });
+//         }
+//     } catch (error) {
+//         res.status(500).send({ message: error.message });
+//     }
+// };
+
+
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
@@ -88,8 +129,7 @@ const loginUser = async (req, res) => {
                     data: user,
                     token: {
                         accessToken: accessToken,
-                        refreshToken: refreshToken,
-                        // expiryTime: new Date().getMinutes() + 300
+                        refreshToken: refreshToken
                     },
                     message: "Authentication Successful"
                 });
@@ -103,6 +143,15 @@ const loginUser = async (req, res) => {
         res.status(500).send({ message: error.message });
     }
 }
+
+const logoutUser = (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).send({ message: 'Could not log out. Please try again.' });
+        }
+        res.status(200).send({ message: 'Logout successful' });
+    });
+};
 
 const getUser = async (req, res) => {
     try {
@@ -131,7 +180,13 @@ const getAllUsers = async (req, res) => {
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
+        const updateFields = req.body;
+
         const editUser = await User.findByIdAndUpdate(id, req.body);
+
+        // const editUser = await User.findByIdAndUpdate(id, updateFields, { new: true, runValidators: true });
+
+        console.log('editUser:', editUser);
 
         if (!editUser) {
             return res.status(404).send({ message: "User not found" });
@@ -181,6 +236,7 @@ module.exports = {
     removeUser,
     removeAllUsers,
     loginUser,
+    logoutUser,
     getAuthUser,
     handleForgotPassword,
     // authorize

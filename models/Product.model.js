@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const User = require('./User.model');
-const Category = require('./Category.model');
 
 const Schema = mongoose.Schema;
 
@@ -30,7 +28,11 @@ const ProductSchema = new Schema(
         },
         category: {
             type: String,
-            // required: true
+            required: true
+        },
+        currency: {
+            type: String,
+            required: true
         },
         tags: [{
             type: String
