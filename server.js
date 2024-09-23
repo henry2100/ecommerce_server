@@ -16,7 +16,7 @@ const orderRoute = require('./routes/order.route');
 const cartRouter = require('./routes/cart.route');
 const messageRouter = require('./routes/message.route');
 
-const portNumber = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 const username = process.env.USER;
 const password = process.env.PASSWD;
 const dbName = process.env.DB_NAME;
@@ -45,7 +45,7 @@ app.use((req, res, next) => {
 const mongodbServer = mongoose.connect(`mongodb+srv://${username}:${password}@mernstackappdb.gg0yse7.mongodb.net/${dbName}?retryWrites=true&w=majority&appName=${dbName}`)
 
     .then(() => {
-        app.listen(portNumber, () => console.log("Database connected successfully"));
+        app.listen(port, () => console.log("Database connected successfully"));
     })
 
     .catch(error => {
