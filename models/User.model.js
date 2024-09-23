@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Cart = require('./Cart.model');
 
 //Define Schema
 const Schema = mongoose.Schema;
@@ -94,6 +95,10 @@ const UserSchema = new Schema(
             enum: ['seller', 'buyer'],
             default: 'buyer'
         },
+        cartId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Cart'
+        },
         imageUrl: {
             type: String,
             required: false
@@ -103,6 +108,29 @@ const UserSchema = new Schema(
         timestamps: true
     }
 );
+
+UserSchema.pre('save', async function (next) {
+    if (this.isNew) {
+        try {
+            const cart = await Cart.create({ userId: this._id });
+            this.cartId = cart._id;
+            next();
+        } catch (error) {
+            next(error);
+        }
+    } else {
+        next();
+    }
+});
+
+UserSchema.pre('remove', async function (next) {
+    try {
+        await Cart.deleteOne({ userId: this._id });
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
 
 const User = mongoose.model('user', UserSchema);
 

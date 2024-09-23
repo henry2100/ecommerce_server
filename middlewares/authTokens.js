@@ -11,9 +11,9 @@ const generateAccessToken = (user) => {
       role: user.role
     },
     JWT_SECRET,
-    {
-      expiresIn: "1h",
-    }
+    // {
+    //   expiresIn: "1h",
+    // }
   );
 };
 
