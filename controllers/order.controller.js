@@ -4,7 +4,7 @@ const createOrderInvoice = async (req, res) => {
     try {
         const newOrder = await OrderInvoice.create(req.body);
         if (!newOrder) {
-            return res.status(400).send("Bad request");
+            return res.status(400).send({message: "Bad request"});
         } else {
             return res.status(200).send({ data: { orderId: newOrder._id }, message: "New Order created successfully" });
         }
@@ -45,7 +45,7 @@ const getOrderInvoice = async (req, res) => {
         const orderInvoice = await OrderInvoice.findById(id);
 
         if (!orderInvoice) {
-            return res.status(404).send("Invoice not found");
+            return res.status(404).send({message: "Invoice not found"});
         } else {
             return res.status(200).send({ data: orderInvoice, message: "Order Invoice retrieved successfully" });
         }

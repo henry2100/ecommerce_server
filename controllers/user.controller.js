@@ -9,7 +9,10 @@ const {
     generateResetToken,
     veryResetToken
 } = require('../middlewares/authTokens');
+const {createCart} = require('./cart.controller');
 const { Session } = require('express-session');
+const updateCartMiddleware = require('../middlewares/updateCart');
+const updateUserCart = require('./cart.controller');
 
 const handleForgotPassword = async (req, res) => {
     console.log("req:", req.body.email);
@@ -48,6 +51,8 @@ const addUser = asyncHandler(async (req, res) => {
         } else {
             const hashedPasswd = await bcrypt.hash(req.body.password, 10);
 
+            // await createCart
+
             const newUser = await User({
                 ...req.body,
                 password: hashedPasswd
@@ -55,6 +60,8 @@ const addUser = asyncHandler(async (req, res) => {
 
             await newUser.save();
             return res.status(200).send({ message: "New User created successfully" });
+
+            
         }
     } catch (error) {
         return res.status(500).send({ message: error.message });
@@ -124,6 +131,8 @@ const loginUser = async (req, res) => {
             if (userPasswd) {
                 const accessToken = await generateAccessToken(user);
                 const refreshToken = await generateRefreshToken(user);
+                // await updateUserCart();
+                // await updateCartMiddleware(req, res, next);
 
                 res.status(200).send({
                     data: user,
@@ -141,7 +150,7 @@ const loginUser = async (req, res) => {
         }
     } catch (error) {
         res.status(500).send({ message: error.message });
-    }
+    }   
 }
 
 const logoutUser = (req, res) => {

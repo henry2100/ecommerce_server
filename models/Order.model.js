@@ -57,6 +57,10 @@ const OrderInvoiceSchema = new Schema(
             type: String,
             required: true
         },
+        currency: {
+            type: String,
+            required:true
+        },
         products: [ProductSchema],
         price: {
             type: Number,
